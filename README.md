@@ -9,7 +9,7 @@ Base container images for Chaitin MonkeyCode developer workflows.
 - Run: `docker run --rm -it ghcr.io/chaitin/monkeycode-runner/base:bookworm bash`
 
 ## Devbox image (bookworm)
-- Dockerfile: `docker/devbox/bookworm/Dockerfile` (extends base image and adds diagnostic tools including htop, ping, wget, ss).
+- Dockerfile: `docker/devbox/bookworm/Dockerfile` (extends base image and adds diagnostic packages: htop, iputils-ping, iproute2 (ip/ss), wget).
 - Build locally: `STACK=devbox VERSION=bookworm ./scripts/build.sh`
 - Push to GHCR: `PUSH=true REGISTRY=ghcr.io/chaitin/monkeycode-runner STACK=devbox VERSION=bookworm ./scripts/build.sh`
 - Run: `docker run --rm -it ghcr.io/chaitin/monkeycode-runner/devbox:bookworm htop`
