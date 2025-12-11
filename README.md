@@ -8,6 +8,12 @@ Base container images for Chaitin MonkeyCode developer workflows.
 - Push to GHCR: `PUSH=true REGISTRY=ghcr.io/chaitin/monkeycode-runner STACK=base VERSION=bookworm ./scripts/build.sh` (needs `docker login ghcr.io`).
 - Run: `docker run --rm -it ghcr.io/chaitin/monkeycode-runner/base:bookworm bash`
 
+## Devbox image (bookworm)
+- Dockerfile: `docker/devbox/bookworm/Dockerfile` (extends base image and adds diagnostic tools including htop, ping, wget, ss).
+- Build locally: `STACK=devbox VERSION=bookworm ./scripts/build.sh`
+- Push to GHCR: `PUSH=true REGISTRY=ghcr.io/chaitin/monkeycode-runner STACK=devbox VERSION=bookworm ./scripts/build.sh`
+- Run: `docker run --rm -it ghcr.io/chaitin/monkeycode-runner/devbox:bookworm htop`
+
 ## Frontend image (node20)
 - Dockerfile: `docker/frontend/node20/Dockerfile` (extends base image with Node.js 20 and Corepack for frontend tooling).
 - Build locally: `STACK=frontend VERSION=node20 ./scripts/build.sh`
@@ -28,6 +34,7 @@ Base container images for Chaitin MonkeyCode developer workflows.
 
 ## Layout
 - `docker/base/bookworm/Dockerfile` – base image definition.
+- `docker/devbox/bookworm/Dockerfile` – devbox image with common diagnostic tools.
 - `docker/frontend/node20/Dockerfile` – Node.js frontend developer image.
 - `docker/golang/1.25-bookworm/Dockerfile` – Go developer image (bookworm + Go 1.25).
 - `docker/rust/1.91-bookworm/Dockerfile` – Rust developer image (bookworm + Rust 1.91).

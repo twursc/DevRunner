@@ -23,6 +23,8 @@ jobs:
         include:
           - stack: base
             version: bookworm
+          - stack: devbox
+            version: bookworm
           - stack: golang
             version: 1.25-bookworm
           - stack: frontend
