@@ -6,6 +6,13 @@ Base container images for Chaitin MonkeyCode developer workflows.
 - Dockerfile: `docker/base/bookworm/Dockerfile` (Debian bookworm-slim, git/curl/build-essential/python3, en_US.UTF-8 locale, default user root).
 - Build locally: `STACK=base VERSION=bookworm ./scripts/build.sh`
 - Push to GHCR: `PUSH=true REGISTRY=ghcr.io/chaitin/monkeycode-runner STACK=base VERSION=bookworm ./scripts/build.sh` (needs `docker login ghcr.io`).
+- Override apt mirrors by setting `DEBIAN_MIRROR` / `DEBIAN_SECURITY_MIRROR` before building.
+- Example (TUNA mirror in mainland China):
+
+  ```bash
+  DEBIAN_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/debian \
+  DEBIAN_SECURITY_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/debian-security \
+  STACK=base VERSION=bookworm ./scripts/build.sh
 - Run: `docker run --rm -it ghcr.io/chaitin/monkeycode-runner/base:bookworm bash`
 
 ## Devbox image (bookworm)

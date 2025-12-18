@@ -21,9 +21,19 @@ if [[ ! -f "${DOCKERFILE}" ]]; then
   exit 1
 fi
 
+BUILD_ARGS=()
+if [[ "${STACK}" == "base" ]]; then
+  if [[ -n "${DEBIAN_MIRROR:-}" ]]; then
+    BUILD_ARGS+=(--build-arg "DEBIAN_MIRROR=${DEBIAN_MIRROR}")
+  fi
+  if [[ -n "${DEBIAN_SECURITY_MIRROR:-}" ]]; then
+    BUILD_ARGS+=(--build-arg "DEBIAN_SECURITY_MIRROR=${DEBIAN_SECURITY_MIRROR}")
+  fi
+fi
+
 IMAGE="$(echo "${REGISTRY}" | tr '[:upper:]' '[:lower:]')/${STACK}:${VERSION}"
 echo "Building ${IMAGE} with ${DOCKERFILE}"
-docker build -f "${DOCKERFILE}" -t "${IMAGE}" .
+docker build "${BUILD_ARGS[@]}" -f "${DOCKERFILE}" -t "${IMAGE}" .
 
 if [[ "${PUSH}" == "true" ]]; then
   echo "Pushing ${IMAGE}"
