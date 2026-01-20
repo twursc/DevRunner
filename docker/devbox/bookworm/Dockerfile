@@ -13,6 +13,7 @@ RUN apt-get update \
         htop \
         iputils-ping \
         iproute2 \
+        php-cli \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
