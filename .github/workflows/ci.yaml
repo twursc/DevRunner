@@ -20,14 +20,64 @@ env:
   DEBIAN_SECURITY_MIRROR: ${{ vars.DEBIAN_SECURITY_MIRROR || 'https://mirrors.tuna.tsinghua.edu.cn/debian-security' }}
 
 jobs:
-  build:
+  build-base:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      STACK: base
+      VERSION: bookworm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.STACK }}
+          tags: |
+            type=raw,value=${{ env.VERSION }}
+            type=raw,value=${{ env.VERSION }}-${{ github.ref_name }},enable=${{ startsWith(github.ref, 'refs/heads/') && github.ref != 'refs/heads/main' }}
+            type=ref,event=tag
+            type=raw,value=${{ env.VERSION }}-${{ github.ref_name }},enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build base (no push on PR)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/${{ env.STACK }}/${{ env.VERSION }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            DEBIAN_MIRROR=${{ env.DEBIAN_MIRROR }}
+            DEBIAN_SECURITY_MIRROR=${{ env.DEBIAN_SECURITY_MIRROR }}
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+
+  build-stacks:
+    needs: build-base
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - stack: base
-            version: bookworm
           - stack: devbox
             version: bookworm
           - stack: golang
@@ -36,6 +86,8 @@ jobs:
             version: node20
           - stack: rust
             version: 1.91-bookworm
+          - stack: java
+            version: 21-bookworm
     permissions:
       contents: read
       packages: write
@@ -72,22 +124,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build base (no push on PR)
-        if: matrix.stack == 'base'
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/${{ matrix.stack }}/${{ matrix.version }}/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            DEBIAN_MIRROR=${{ env.DEBIAN_MIRROR }}
-            DEBIAN_SECURITY_MIRROR=${{ env.DEBIAN_SECURITY_MIRROR }}
-          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-
       - name: Build (no push on PR)
-        if: matrix.stack != 'base'
         uses: docker/build-push-action@v5
         with:
           context: .

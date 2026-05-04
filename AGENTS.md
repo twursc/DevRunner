@@ -5,6 +5,7 @@
 This repository contains Docker container images for Chaitin MonkeyCode developer workflows. The structure is organized as follows:
 
 - `docker/base/bookworm/` - Base Debian bookworm-slim image with essential development tools
+- `docker/devbox/bookworm/` - All-in-one devbox with Go, Node.js, Python, and common packages (extends base)
 - `docker/frontend/node20/` - Node.js 20 frontend development image (extends base)
 - `docker/golang/1.25-bookworm/` - Go 1.25 development image (extends base)
 - `scripts/build.sh` - Environment-driven build script for all images
@@ -19,6 +20,9 @@ Each stack directory contains a single `Dockerfile` defining that specific image
 ```bash
 # Base image
 STACK=base VERSION=bookworm ./scripts/build.sh
+
+# Devbox all-in-one image
+STACK=devbox VERSION=bookworm ./scripts/build.sh
 
 # Frontend Node.js image
 STACK=frontend VERSION=node20 ./scripts/build.sh
@@ -36,6 +40,9 @@ PUSH=true REGISTRY=ghcr.io/chaitin/monkeycode-runner STACK=base VERSION=bookworm
 ```bash
 # Base image
 docker run --rm -it ghcr.io/chaitin/monkeycode-runner/base:bookworm bash
+
+# Devbox all-in-one image
+docker run --rm -it ghcr.io/chaitin/monkeycode-runner/devbox:bookworm bash
 
 # Frontend image
 docker run --rm -it ghcr.io/chaitin/monkeycode-runner/frontend:node20 node --version
@@ -88,7 +95,7 @@ docker run --rm -it ghcr.io/chaitin/monkeycode-runner/golang:1.25-bookworm go ve
 
 ### CI Testing
 - All images must build successfully in GitHub Actions
-- Matrix builds test all three stacks concurrently
+- Matrix builds test all stacks concurrently
 - Multi-architecture support is verified automatically
 
 ## Commit & Pull Request Guidelines
@@ -136,5 +143,6 @@ Default registry: `ghcr.io/chaitin/monkeycode-runner`
 Image naming: `{registry}/{stack}:{version}`
 Examples:
 - `ghcr.io/chaitin/monkeycode-runner/base:bookworm`
+- `ghcr.io/chaitin/monkeycode-runner/devbox:bookworm`
 - `ghcr.io/chaitin/monkeycode-runner/frontend:node20`
 - `ghcr.io/chaitin/monkeycode-runner/golang:1.25-bookworm`
